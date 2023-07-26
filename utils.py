@@ -12,6 +12,7 @@ import cv2
 from torch_lr_finder import LRFinder
 import torch.nn as nn
 from pytorch_grad_cam import GradCAM
+from pytorch_grad_cam.utils.image import show_cam_on_image
 from pytorch_grad_cam.utils.model_targets import ClassifierOutputTarget
 
 
@@ -232,11 +233,13 @@ def gradcam_vis(model,target_layers, misclf, classes,plot_size=(4,5)):
         targets = [ClassifierOutputTarget(label)]
         grayscale_cam = cam(input_tensor=img_model.unsqueeze(0), targets=targets)
         grayscale_cam = grayscale_cam[0, :]
+        cam_image = show_cam_on_image(img, grayscale_cam, use_rgb=True)
+        cam_image = cv2.cvtColor(cam_image, cv2.COLOR_RGB2BGR)
         figure.add_subplot(rows, cols, i) # adding sub plot
         plt.title(f"Pred label: {classes[pred]}\n True label: {classes[label]}") # title of plot
         plt.axis("off") # hiding the axis
         plt.imshow(img) # showing the plot
-        plt.imshow(grayscale_cam, cmap='jet', alpha=0.40)
+        plt.imshow(cam_image)
 
     plt.tight_layout()
     plt.show()
